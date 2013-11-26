@@ -1,6 +1,6 @@
 # CONVOFLUTE by Colin McSwiggen
 # A little convolution-based intstrument/sound-design tool.
-# Released in 2013 under a Creative Commons BY-NC-SA license.
+# Released in 2013 under the GNU GPL.
 
 import numpy as np
 import numm
@@ -11,8 +11,8 @@ SAMPLE_RATE = 44100  # By default the audio will play back at 44.1kHz.  Changing
 CHUNK_SIZE = 2048  # The number of samples per chunk. This is assumed to be shorter than one pixel's worth of audio.
 # TODO: Allow playback buffers shorter than the chunk size.
 
-VID_WIDTH = 640  # Width of video output.
-VID_HEIGHT = 480  # Height of video output.
+VID_WIDTH = 1024  # Width of video output.
+VID_HEIGHT = 768  # Height of video output.
 background = np.zeros((VID_HEIGHT, VID_WIDTH, 3)).astype('uint8')  # A blank background to fill with the spectra visualization later.
 
 outTL = (0.0,0.0)  # Fractional coordinates of top left point of playback rectangle.
@@ -50,7 +50,7 @@ def convolveSegments(buffer1, buffer2, endpts1, endpts2):
 	# endpts1 and endpts2 are tuples of fractional start and stop times of segments within each buffer.
 	# Returns the convolution of the indicated buffer segments.
 
-	print "Convolving segments " + str((int(endpts1[0]*buffer1.shape[0]), int(endpts1[1]*buffer1.shape[0]))) + " and " + str((int(endpts2[0]*buffer2.shape[0]), int(endpts2[1]*buffer2.shape[0]))) + "."
+	#print "Convolving segments " + str((int(endpts1[0]*buffer1.shape[0]), int(endpts1[1]*buffer1.shape[0]))) + " and " + str((int(endpts2[0]*buffer2.shape[0]), int(endpts2[1]*buffer2.shape[0]))) + "."
 
 	# Extract and window the segments.
 	seg1 = window(buffer1[int(endpts1[0]*buffer1.shape[0]):int(endpts1[1]*buffer1.shape[0])])
@@ -59,20 +59,20 @@ def convolveSegments(buffer1, buffer2, endpts1, endpts2):
 	# Match the lengths of the segments by appending zeros to the shorter one.
 	# Ensure that the segments have even length.
 	if seg1.shape[0] < seg2.shape[0]:
-		print "Padding segment 1..."
+		#print "Padding segment 1..."
 		seg1 = np.concatenate( (seg1, np.zeros((seg2.shape[0] - seg1.shape[0] + (seg2.shape[0]%2), 2))), axis=0)
 		seg2 = np.concatenate( (seg2, np.zeros(((seg2.shape[0]%2),2))), axis=0 )
 
 	elif seg2.shape[0] < seg1.shape[0]:
-		print "Padding segment 2..."
+		#print "Padding segment 2..."
 		seg2 = np.concatenate( (seg2, np.zeros((seg1.shape[0] - seg2.shape[0] + (seg1.shape[0]%2), 2))), axis=0)
 		seg1 = np.concatenate( (seg1, np.zeros(((seg1.shape[0]%2),2))), axis=0 )
 
-	print "Finished padding. Seg1 length: " + str(seg1.shape[0]) + " Seg2 length: " + str(seg2.shape[0]) + " Convolving..."
+	#print "Finished padding. Seg1 length: " + str(seg1.shape[0]) + " Seg2 length: " + str(seg2.shape[0]) + " Convolving..."
 	spec = np.fft.rfft(seg1.T) * np.fft.rfft(seg2.T)
-	print "spec: " + str(spec)
+	#print "spec: " + str(spec)
 	convolution = np.fft.irfft(spec).T
-	print "Convolution: " + str(convolution)
+	#print "Convolution: " + str(convolution)
 	return convolution  # Return the convolution.
 
 
@@ -80,10 +80,10 @@ def updateLoop(buffer1, buffer2, endpts1, endpts2):
 	global freshLoop, loopStale
 
 	convolution = convolveSegments(buffer1, buffer2, endpts1, endpts2)
-	print "Convolution complete.  Filling fresh buffer."
+	#print "Convolution complete.  Filling fresh buffer."
 	freshLoop = scale(convolution, 32000).astype('int16')
 	loopStale = True
-	print "Current buffer flagged as stale."
+	#print "Current buffer flagged as stale."
 
 
 def audio_out(chunk):

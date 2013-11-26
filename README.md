@@ -1,7 +1,8 @@
 The Convoflute,
 a sound design tool.
 
-By Colin McSwiggen, 2013, CC BY-NC-SA
+By Colin McSwiggen, 2013.
+Released under the GNU GPL.
 
 Requires numm: http://readmes.numm.org/numm/
 
